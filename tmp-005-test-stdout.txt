@@ -1,0 +1,6 @@
+B: TF:    6 - TJ:    0 - HF:    4 - OF:    2 - Thread 4 called Bond(0,1,4).
+B: TF:    6 - TJ:    0 - HF:    4 - OF:    2 - Thread 0 called Bond(0,1,4).
+B: TF:    6 - TJ:    0 - HF:    4 - OF:    2 - Thread 1 called Bond(0,1,4).
+B: TF:    6 - TJ:    0 - HF:    4 - OF:    2 - Thread 5 called Bond(2,3,5).
+B: TF:    6 - TJ:    0 - HF:    4 - OF:    2 - Thread 2 called Bond(2,3,5).
+B: TF:    6 - TJ:    0 - HF:    4 - OF:    2 - Thread 3 called Bond(2,3,5).
