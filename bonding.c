@@ -1,3 +1,5 @@
+//Lab A: Bonding
+//Madelyn Gross
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -145,6 +147,7 @@ void *oxygen(void *arg)
   //this must be unlocked first
   pthread_mutex_unlock(g->lock);
   char *result = Bond(thisThread->h1Id, thisThread->h2Id, thisThread->oId);
+  free(thisThread->condition);
   free(thisThread);
   
   return result; //return this because it will print this out to stdout at some point I think
