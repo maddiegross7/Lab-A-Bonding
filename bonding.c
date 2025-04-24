@@ -13,6 +13,7 @@ typedef struct global_info{
   Dllist oxygen;
 } Global_Info;
 
+//Each oxygen and hydrogen will have one of these
 typedef struct thread_info{
   int id;
   pthread_cond_t *condition;
@@ -21,6 +22,7 @@ typedef struct thread_info{
   int oId;
 } Thread_Info;
 
+//just initializing the global info because ig they thought this was important
 void *initialize_v(char *verbosity)
 {
   Global_Info *info = malloc(sizeof(struct global_info));
@@ -47,10 +49,13 @@ void *hydrogen(void *arg)
   thisThread->h2Id = -1;
   thisThread->oId = -1;
 
+  //do both list have something in them? if not add to the list and wait
   if(dll_empty(g->hydrogen) == 1 || dll_empty(g->oxygen) == 1){
     dll_append(g->hydrogen, new_jval_v(thisThread));
     pthread_cond_wait(thisThread->condition, g->lock);
   }else{
+    //we have what we need so we can bond
+    //getting the first hydrogen and oxygen in each list
     ptr = dll_first(g->hydrogen);
     Thread_Info *h2 = (Thread_Info *)ptr->val.v;
     dll_delete_node(ptr);
@@ -74,10 +79,12 @@ void *hydrogen(void *arg)
     o->h2Id = h2->id;
     o->oId = o->id;
 
+    //signal the other threads conditions to wake up
     pthread_cond_signal(h2->condition);
     pthread_cond_signal(o->condition);
   }
 
+  //unlock must happen first but then call 
   pthread_mutex_unlock(g->lock);
   char *result = Bond(thisThread->h1Id, thisThread->h2Id, thisThread->oId);
   free(thisThread);
@@ -85,6 +92,7 @@ void *hydrogen(void *arg)
   return result;
 }
 
+//basically the same as hydrogen just a little bit different logic
 void *oxygen(void *arg)
 {
   struct bonding_arg *a = (struct bonding_arg *)arg;
@@ -100,8 +108,9 @@ void *oxygen(void *arg)
   thisThread->h2Id = -1;
   thisThread->oId = -1;
 
+  //now we check if the hydrogen list has 2 elements in it? if not append to the oxygen list
   if(dll_empty(g->hydrogen) || dll_next(dll_first(g->hydrogen)) == g->hydrogen){
-    dll_append(g->hydrogen, new_jval_v(thisThread));
+    dll_append(g->oxygen, new_jval_v(thisThread));//append it to oxygen list silly
     pthread_cond_wait(thisThread->condition, g->lock);
   }else{
     ptr = dll_first(g->hydrogen);
@@ -128,13 +137,15 @@ void *oxygen(void *arg)
     h2->h2Id = h2->id;
     h2->oId = thisThread->id;
 
+    //signal the other threads 
     pthread_cond_signal(h1->condition);
     pthread_cond_signal(h2->condition);
   }
 
+  //this must be unlocked first
   pthread_mutex_unlock(g->lock);
   char *result = Bond(thisThread->h1Id, thisThread->h2Id, thisThread->oId);
   free(thisThread);
   
-  return result; //?? idk do I need to return this who knows??
+  return result; //return this because it will print this out to stdout at some point I think
 }
